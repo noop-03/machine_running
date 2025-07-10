@@ -1,1 +1,1 @@
-# machine_running
+pip install numpy matplotlib scikit-learn
