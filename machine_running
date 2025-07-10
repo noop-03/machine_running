@@ -1,0 +1,71 @@
+# -*- coding: utf-8 -*-
+"""
+학습 시간 대비 시험 점수 예측 (선형 회귀)
+"""
+
+# 1. 필요한 라이브러리 임포트
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.linear_model import LinearRegression
+from sklearn.model_selection import train_test_split
+
+# 2. 가상 데이터 생성
+np.random.seed(42)  # 결과 재현을 위한 랜덤 시드 고정
+
+# 20명의 학생 데이터 (1~9시간 사이 공부 시간)
+study_time = np.random.randint(1, 10, 20)  
+
+# 시험 점수 = 공부시간 * 10 + 노이즈 (평균 0, 표준편차 5)
+exam_score = study_time * 10 + np.random.normal(0, 5, 20)  
+
+# 3. 데이터 시각화 (원본 데이터)
+plt.scatter(study_time, exam_score, color='blue', label='Actual Data')
+plt.xlabel("Study Time (hours)")
+plt.ylabel("Exam Score (points)")
+plt.title("Study Time vs Exam Score")
+plt.grid(True)
+plt.legend()
+plt.show()
+
+# 4. 데이터 분할 (훈련 80%, 테스트 20%)
+X = study_time.reshape(-1, 1)  # 입력 데이터는 2D 배열로 변환
+y = exam_score                 # 출력 데이터
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
+
+# 5. 선형 회귀 모델 학습
+model = LinearRegression()
+model.fit(X_train, y_train)  # 훈련 데이터로 학습
+
+# 학습 결과 파라미터 출력
+print(f"[모델 파라미터]")
+print(f"- 기울기 (1시간당 점수 증가량): {model.coef_[0]:.2f}")
+print(f"- y절편 (0시간 예측 점수): {model.intercept_:.2f}\n")
+
+# 6. 테스트 데이터로 예측
+y_pred = model.predict(X_test)
+
+# 예측 결과 비교
+print("[테스트 데이터 예측 결과]")
+for i in range(len(X_test)):
+    print(f"공부시간: {X_test[i][0]}시간 → 실제: {y_test[i]:.1f}점, 예측: {y_pred[i]:.1f}점")
+
+# 7. 전체 데이터와 회귀선 시각화
+plt.scatter(X, y, color='blue', label='Actual Data')
+plt.plot(X, model.predict(X), color='red', linewidth=2, label='Prediction Line')
+plt.xlabel("Study Time (hours)")
+plt.ylabel("Exam Score (points)")
+plt.title("Linear Regression Model")
+plt.grid(True)
+plt.legend()
+plt.show()
+
+# 8. 새로운 데이터 예측
+new_time = np.array([[5.5], [8.0]])  # 5.5시간과 8.0시간 공부한 경우
+predicted_scores = model.predict(new_time)
+
+print("\n[새로운 데이터 예측]")
+for time, score in zip(new_time, predicted_scores):
+    print(f"{time[0]}시간 공부 → 예상 점수: {score:.1f}점")
